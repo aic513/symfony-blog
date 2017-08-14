@@ -4,77 +4,66 @@
 namespace Blogger\BlogBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Blogger\BlogBundle\Entity\Repository\BlogRepository")
  * @ORM\Table(name="blog")
  * @ORM\HasLifecycleCallbacks
  */
 class Blog
 {
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
 
-	public function __construct()
-	{
-		$this->setCreated(new \DateTime());
-		$this->setUpdated(new \DateTime());
-	}
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $title;
 
-	/**
-	 * @ORM\PreUpdate
-	 */
-	public function setUpdatedValue()
-	{
-		$this->setUpdated(new \DateTime());
-	}
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    protected $author;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\Column(type="integer")
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	protected $id;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $blog;
 
-	/**
-	 * @ORM\Column(type="string")
-	 */
-	protected $title;
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    protected $image;
 
-	/**
-	 * @ORM\Column(type="string", length=100)
-	 */
-	protected $author;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $tags;
 
-	/**
-	 * @ORM\Column(type="text")
-	 */
-	protected $blog;
+    /**
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="blog")
+     */
+    protected $comments;
 
-	/**
-	 * @ORM\Column(type="string", length=20)
-	 */
-	protected $image;
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $created;
 
-	/**
-	 * @ORM\Column(type="text")
-	 */
-	protected $tags;
-
-	protected $comments;
-
-	/**
-	 * @ORM\Column(type="datetime")
-	 */
-	protected $created;
-
-	/**
-	 * @ORM\Column(type="datetime")
-	 */
-	protected $updated;
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $updated;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -85,6 +74,7 @@ class Blog
      * Set title
      *
      * @param string $title
+     *
      * @return Blog
      */
     public function setTitle($title)
@@ -97,7 +87,7 @@ class Blog
     /**
      * Get title
      *
-     * @return string 
+     * @return string
      */
     public function getTitle()
     {
@@ -108,6 +98,7 @@ class Blog
      * Set author
      *
      * @param string $author
+     *
      * @return Blog
      */
     public function setAuthor($author)
@@ -120,7 +111,7 @@ class Blog
     /**
      * Get author
      *
-     * @return string 
+     * @return string
      */
     public function getAuthor()
     {
@@ -131,6 +122,7 @@ class Blog
      * Set blog
      *
      * @param string $blog
+     *
      * @return Blog
      */
     public function setBlog($blog)
@@ -143,17 +135,21 @@ class Blog
     /**
      * Get blog
      *
-     * @return string 
+     * @return string
      */
-    public function getBlog()
+    public function getBlog($length = null)
     {
-        return $this->blog;
+        if (false === is_null($length) && $length > 0)
+            return substr($this->blog, 0, $length);
+        else
+            return $this->blog;
     }
 
     /**
      * Set image
      *
      * @param string $image
+     *
      * @return Blog
      */
     public function setImage($image)
@@ -166,7 +162,7 @@ class Blog
     /**
      * Get image
      *
-     * @return string 
+     * @return string
      */
     public function getImage()
     {
@@ -177,6 +173,7 @@ class Blog
      * Set tags
      *
      * @param string $tags
+     *
      * @return Blog
      */
     public function setTags($tags)
@@ -189,7 +186,7 @@ class Blog
     /**
      * Get tags
      *
-     * @return string 
+     * @return string
      */
     public function getTags()
     {
@@ -200,6 +197,7 @@ class Blog
      * Set created
      *
      * @param \DateTime $created
+     *
      * @return Blog
      */
     public function setCreated($created)
@@ -212,7 +210,7 @@ class Blog
     /**
      * Get created
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreated()
     {
@@ -223,6 +221,7 @@ class Blog
      * Set updated
      *
      * @param \DateTime $updated
+     *
      * @return Blog
      */
     public function setUpdated($updated)
@@ -235,10 +234,65 @@ class Blog
     /**
      * Get updated
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdated()
     {
         return $this->updated;
+    }
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+
+        $this->setCreated(new \DateTime());
+        $this->setUpdated(new \DateTime());
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->setUpdated(new \DateTime());
+    }
+
+    /**
+     * Add comment
+     *
+     * @param \Blogger\BlogBundle\Entity\Comment $comment
+     *
+     * @return Blog
+     */
+    public function addComment(\Blogger\BlogBundle\Entity\Comment $comment)
+    {
+        $this->comments[] = $comment;
+
+        return $this;
+    }
+
+    /**
+     * Remove comment
+     *
+     * @param \Blogger\BlogBundle\Entity\Comment $comment
+     */
+    public function removeComment(\Blogger\BlogBundle\Entity\Comment $comment)
+    {
+        $this->comments->removeElement($comment);
+    }
+
+    /**
+     * Get comments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+    
+    public function __toString()
+    {
+        return $this->getTitle();
     }
 }

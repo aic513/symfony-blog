@@ -11,21 +11,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnquiryType extends AbstractType
 {
-	public function buildForm(FormBuilderInterface $builder, array $options)
-	{
-		$builder->add('name', TextType::class);
-		$builder->add('email', EmailType::class);
-		$builder->add('subject', TextType::class);
-		$builder->add('body', TextareaType::class);
-	}
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('name', TextType::class);
+        $builder->add('email', EmailType::class);
+        $builder->add('subject', TextType::class);
+        $builder->add('body', TextareaType::class);
+    }
 
-	public function configureOptions(OptionsResolver $resolver)
-	{
+    public function configureOptions(OptionsResolver $resolver)
+    {
 
-	}
+    }
 
-	public function getBlockPrefix()
-	{
-		return 'contact';
-	}
+    public function getBlockPrefix()
+    {
+        return 'contact';
+    }
 }
